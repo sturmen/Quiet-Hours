@@ -12,9 +12,10 @@ import android.text.format.Time;
 import android.util.Log;
 
 public class PhoneStateListener extends BroadcastReceiver{
-
-	private Cursor mCursor = null;
-	private static final String[] mProjection =
+	//initialize cursor
+	private Cursor mCursor = null; 
+	//initialize projection; required for content querying
+	private static final String[] mProjection = 
 			new String[] {
 		CalendarContract.Events._ID,
 		CalendarContract.Events.TITLE,
@@ -22,61 +23,91 @@ public class PhoneStateListener extends BroadcastReceiver{
 		CalendarContract.Events.DTSTART,
 		CalendarContract.Events.DTEND
 	};
+	//define the vibrate keyphrase as a CharSequence
 	private CharSequence vibrate = "_vibrate".subSequence(0,7);
+	//define the silent keyphrase as a CharSequence
 	private CharSequence silent = "_silent".subSequence(0,6);
+	//glovally define the debug tag
 	private static final String tag = "QUIETHOURS";
+	private static int original = 0;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		//initilize the audio manager
 		AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		//gather up the intent's extras into a bundle
 		Bundle extras = intent.getExtras();
+		//sanity check: if they exist...
 		if (extras != null) {
+			//get the state of the telephone
 			String state = extras.getString(TelephonyManager.EXTRA_STATE);
 			Log.d(tag, state);
+			//if the call is ending or otherwise returning to idle
 			if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-				ringer.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				//put the ringer back to what it was
+				if (original != 0) ringer.setRingerMode(original);
 				Log.d(tag, "Phone returned to normal.");
-			} else 
+			}
+			//otherwise it's idle -> ringing or ringing -> call
+			//so we must act
+			else { 
+				//store the previous phone state so we can return to it.
+				original = ringer.getRingerMode();
+				//and then this is where the magic happens...
 				getCurrent(context, ringer);
+			}
 		}
 	}
 
 
 
 	public void getCurrent(Context context, AudioManager ringer){
+		//initialize an empty time
 		Time time = new Time();
+		//set the time to now
 		time.setToNow();
+		//convert the current time to milliseconds, ignoring Daylight Savings Time
 		long now = time.toMillis(true);
 		Log.d(tag, "" + now);
+		//define what we want in a calendar event. One that starts before now AND ends after now.
 		String mSelectionClause = CalendarContract.Events.DTSTART + " <= " + now + " AND " + now + " <= " + CalendarContract.Events.DTEND;
 		Log.d(tag, "mSelectionClause =" +  mSelectionClause);
-		String[] mSelectionArgs = {""};
-		mSelectionArgs[0] = "Vibrate";
-		Log.d(tag, mSelectionArgs[0]);
+		//we want the results sorted by which started first, just becase
 		String mSortOrder = CalendarContract.Events.DTSTART + " ASC";
 		Log.d(tag, "mSortOrder =" + mSortOrder);
+		//query the calendar provider and get the resulting cursor
 		mCursor = context.getContentResolver().query(CalendarContract.Events.CONTENT_URI, mProjection, mSelectionClause, null, mSortOrder);
+		//Move to first: must be done or everything dies
 		mCursor.moveToFirst();
 		if (null == mCursor) {
-			Log.d(tag, "ERROR!");
 			// If the Cursor is empty, the provider found no matches
-		} else if (mCursor.getCount() < 1) {
+			Log.d(tag, "ERROR!");
+		} else
+			//no events. Move along.
+			if (mCursor.getCount() < 1) {
+				original = 0;
 			Log.d(tag, "No events. Putting on back.");
 		} else {
+			//evaluate the first one
 			evaluate(ringer, mCursor);
+			//evaluate the rest of them
 			while(mCursor.moveToNext()){
 				evaluate(ringer, mCursor);
 			}
 		}
 	}
 	public void evaluate(AudioManager ringer, Cursor cursor){
+		//check the description for the silent keyphrase
 		if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(silent))
 		{
+			//if it's there, change to silent
 			ringer.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to silent!");
 		}
+		//check the description for the silent keyphrase
 		else if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(vibrate)) {
-			ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+			//same, but do not override silent with vibrate!
+			if (ringer.getRingerMode() != AudioManager.RINGER_MODE_SILENT) ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
 			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to vibrate!");
 		}
 	}
