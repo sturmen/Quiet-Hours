@@ -9,7 +9,7 @@
     <string name="explanation">Simply add &quot;_silent&quot; or &quot;_vibrate&quot; anywhere in the description field of a calendar event (one that is synced to your phone, of course!) and all phone calls will be either silent or vibrating duration of the calendar event.</string>
     <string name="thanks">Thanks!</string>
     <string name="contact">Please contact me if you have feedback: sturmen@outlook.com (or catch me on twitter: @sturmen)</string>
-    <string name="opensource">Open Source</string>
+    <string name="opensource">Open Source!</string>
     <string name="getsource">This application is open source. You can find the source code for Quiet Hours here: https://github.com/sturmen/Quiet-Hours</string>
     <string name="title_activity_quiet_hours">Quiet Hours</string>
 
