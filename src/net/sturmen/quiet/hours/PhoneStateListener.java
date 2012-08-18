@@ -44,13 +44,13 @@ public class PhoneStateListener extends BroadcastReceiver{
 	private CharSequence vibrate = "_vibrate".subSequence(0,7);
 	//define the silent keyphrase as a CharSequence
 	private CharSequence silent = "_silent".subSequence(0,6);
-	//glovally define the debug tag
+	//globally define the debug tag
 	private static final String tag = "QUIETHOURS";
 	private static int original = 0;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		//initilize the audio manager
+		//initialize the audio manager
 		AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		//gather up the intent's extras into a bundle
 		Bundle extras = intent.getExtras();
@@ -89,7 +89,7 @@ public class PhoneStateListener extends BroadcastReceiver{
 		//define what we want in a calendar event. One that starts before now AND ends after now.
 		String mSelectionClause = CalendarContract.Events.DTSTART + " <= " + now + " AND " + now + " <= " + CalendarContract.Events.DTEND;
 		Log.d(tag, "mSelectionClause =" +  mSelectionClause);
-		//we want the results sorted by which started first, just becase
+		//we want the results sorted by which started first, just because
 		String mSortOrder = CalendarContract.Events.DTSTART + " ASC";
 		Log.d(tag, "mSortOrder =" + mSortOrder);
 		//query the calendar provider and get the resulting cursor
