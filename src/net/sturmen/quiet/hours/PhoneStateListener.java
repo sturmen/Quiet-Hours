@@ -61,13 +61,15 @@ public class PhoneStateListener extends BroadcastReceiver{
 			if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 				//put the ringer back to what it was
 				if (original != 0) ringer.setRingerMode(original);
-				Log.d(tag, "Phone returned to normal.");
+				Log.d(tag, "Phone returned to " + original);
+				original = 0;
 			}
 			//otherwise it's idle -> ringing or ringing -> call
 			//so we must act
-			else { 
+			else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){ 
 				//store the previous phone state so we can return to it.
 				original = ringer.getRingerMode();
+				Log.d(tag, "Original stored as " + state);
 				//and then this is where the magic happens...
 				getCurrent(context, ringer);
 			}
@@ -107,18 +109,18 @@ public class PhoneStateListener extends BroadcastReceiver{
 		mCursor.close();
 	}
 	public void evaluate(AudioManager ringer, Cursor cursor){
-		//check the description for the silent keyphrase
-		if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(silent))
+		//check the description and title for the silent keyphrase
+		if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(silent) || cursor.getString(cursor.getColumnIndex("TITLE")).contains(silent))
 		{
 			//if it's there, change to silent
 			ringer.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to silent!");
+			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to silent! (" + ringer.getRingerMode() + ")");
 		}
-		//check the description for the silent keyphrase
-		else if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(vibrate)) {
+		//check the description and title for the vibrate keyphrase
+		else if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(vibrate) || cursor.getString(cursor.getColumnIndex("TITLE")).contains(vibrate)) {
 			//same, but do not override silent with vibrate!
 			if (ringer.getRingerMode() != AudioManager.RINGER_MODE_SILENT) ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to vibrate!");
+			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to vibrate!(" + ringer.getRingerMode() + ")");
 		}
 	}
 

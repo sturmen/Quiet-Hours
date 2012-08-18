@@ -2,14 +2,13 @@ TODO before 1.0 public release
 -Add PreferencesActivity
 --"set on boot" checkbox
 --Start/Stop for the service (ToggleButton?)
--Service checks Calendar event title, not just description
---Common mistake among testers, probably common among general populace
 -Fix any and all bugs
 --Must debug Motorola Droid Bionic running prerelease software
 
 TODO post-release
 -SMS support
 -Notification of any sort support
+-In-app purchase to remove ads
 -Ongoing Notification
 --Checkbox in preferences
 --Tapping the notification stops the service and clears the notification

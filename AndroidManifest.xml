@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.sturmen.quiet.hours"
-    android:versionCode="2"
+    android:versionCode="4"
     android:versionName="0.2" >
 
     <uses-sdk
