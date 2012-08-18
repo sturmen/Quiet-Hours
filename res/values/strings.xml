@@ -1,16 +1,19 @@
 <resources>
 
+    <string name="title_activity_quiet_hours">Quiet Hours</string>
     <string name="app_name">Quiet Hours</string>
-    <string name="hello">Hello!</string>
+    <string name="hello">Hello</string>
     <string name="intro">Welcome to Quiet Hours! You will only see this screen once. The background service has been started.</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="howto">How To Use:</string>
+    <string name="howto">How To Use</string>
     <string name="explanation">Simply add &quot;_silent&quot; or &quot;_vibrate&quot; anywhere in the description field of a calendar event (one that is synced to your phone, of course!) and all phone calls will be either silent or vibrating duration of the calendar event.</string>
-    <string name="thanks">Thanks!</string>
+    <string name="thanks">Thanks</string>
     <string name="contact">Please contact me if you have feedback: sturmen@outlook.com (or catch me on twitter: https://twitter.com/sturmen)</string>
-    <string name="opensource">Open Source!</string>
+    <string name="opensource">Open Source</string>
     <string name="getsource">This application is open source. You can find the source code for Quiet Hours here: https://github.com/sturmen/Quiet-Hours</string>
-    <string name="title_activity_quiet_hours">Quiet Hours</string>
+    <string name="options">Options</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="settings">Settings</string>
 
 </resources>
