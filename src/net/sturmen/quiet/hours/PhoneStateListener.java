@@ -12,7 +12,7 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
  */
 
 package net.sturmen.quiet.hours;
@@ -28,9 +28,7 @@ import android.telephony.TelephonyManager;
 import android.text.format.Time;
 import android.util.Log;
 
-public class PhoneStateListener extends BroadcastReceiver{
-	//initialize cursor
-	private Cursor mCursor = null; 
+public class PhoneStateListener extends BroadcastReceiver{ 
 	//initialize projection; required for content querying
 	private static final String[] mProjection = 
 			new String[] {
@@ -77,7 +75,6 @@ public class PhoneStateListener extends BroadcastReceiver{
 	}
 
 
-
 	public void getCurrent(Context context, AudioManager ringer){
 		//initialize an empty time
 		Time time = new Time();
@@ -93,16 +90,11 @@ public class PhoneStateListener extends BroadcastReceiver{
 		String mSortOrder = CalendarContract.Events.DTSTART + " ASC";
 		Log.d(tag, "mSortOrder =" + mSortOrder);
 		//query the calendar provider and get the resulting cursor
-		mCursor = context.getContentResolver().query(CalendarContract.Events.CONTENT_URI, mProjection, mSelectionClause, null, mSortOrder);
+		Cursor mCursor = context.getContentResolver().query(CalendarContract.Events.CONTENT_URI, mProjection, mSelectionClause, null, mSortOrder);
 		//Move to first: must be done or everything dies
 		mCursor.moveToFirst();
-		if (null == mCursor) {
-			// If the Cursor is empty, the provider found no matches
-			Log.d(tag, "ERROR!");
-		} else
-			//no events. Move along.
-			if (mCursor.getCount() < 1) {
-				original = 0;
+		if (mCursor.getCount() < 1) {
+			original = 0;
 			Log.d(tag, "No events. Putting on back.");
 		} else {
 			//evaluate the first one
@@ -112,6 +104,7 @@ public class PhoneStateListener extends BroadcastReceiver{
 				evaluate(ringer, mCursor);
 			}
 		}
+		mCursor.close();
 	}
 	public void evaluate(AudioManager ringer, Cursor cursor){
 		//check the description for the silent keyphrase
