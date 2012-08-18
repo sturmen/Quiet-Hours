@@ -11,6 +11,6 @@
     <string name="contact">Please contact me if you have feedback: sturmen@outlook.com (or catch me on twitter: @sturmen)</string>
     <string name="opensource">Open Source</string>
     <string name="getsource">This application is open source. You can find the source code for Quiet Hours here: https://github.com/sturmen/Quiet-Hours</string>
-    <string name="title_activity_quiet_hours">QuietHours</string>
+    <string name="title_activity_quiet_hours">Quiet Hours</string>
 
 </resources>
