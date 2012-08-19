@@ -20,9 +20,11 @@ package net.sturmen.quiet.hours;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.telephony.TelephonyManager;
 import android.text.format.Time;
@@ -48,34 +50,36 @@ public class PhoneStateListener extends BroadcastReceiver{
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		//initialize the audio manager
-		AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-		//gather up the intent's extras into a bundle
-		Bundle extras = intent.getExtras();
-		//sanity check: if they exist...
-		if (extras != null) {
-			//get the state of the telephone
-			String state = extras.getString(TelephonyManager.EXTRA_STATE);
-			Log.d(tag, state);
-			//if the call is ending or otherwise returning to idle
-			if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-				//put the ringer back to what it was
-				if (original != 0) ringer.setRingerMode(original);
-				Log.d(tag, "Phone returned to " + original);
-				original = 0;
-			}
-			//otherwise it's idle -> ringing or ringing -> call
-			//so we must act
-			else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){ 
-				//store the previous phone state so we can return to it.
-				original = ringer.getRingerMode();
-				Log.d(tag, "Original stored as " + state);
-				//and then this is where the magic happens...
-				getCurrent(context, ringer);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		if (prefs.getBoolean("pref_key_enabled", false)) {
+			//initialize the audio manager
+			AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+			//gather up the intent's extras into a bundle
+			Bundle extras = intent.getExtras();
+			//sanity check: if they exist...
+			if (extras != null) {
+				//get the state of the telephone
+				String state = extras.getString(TelephonyManager.EXTRA_STATE);
+				Log.d(tag, state);
+				//if the call is ending or otherwise returning to idle
+				if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+					//put the ringer back to what it was
+					if (original != 0) ringer.setRingerMode(original);
+					Log.d(tag, "Phone returned to " + original);
+					original = 0;
+				}
+				//otherwise it's idle -> ringing or ringing -> call
+				//so we must act
+				else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){ 
+					//store the previous phone state so we can return to it.
+					original = ringer.getRingerMode();
+					Log.d(tag, "Original stored as " + state);
+					//and then this is where the magic happens...
+					getCurrent(context, ringer);
+				}
 			}
 		}
 	}
-
 
 	public void getCurrent(Context context, AudioManager ringer){
 		//initialize an empty time
