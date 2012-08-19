@@ -4,13 +4,4 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment
-        android:id="@+id/intro"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        class="net.sturmen.quiet.hours.IntroFragment" >
-
-    </fragment>
-
 </LinearLayout>

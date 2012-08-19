@@ -15,7 +15,9 @@ public class QuietHours extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_quiet_hours);
-
+		FragmentTransaction transaction = getFragmentManager().beginTransaction().replace(android.R.id.content, new IntroFragment());
+		transaction.addToBackStack(null);
+		transaction.commit();
 	}
 
 	@Override
@@ -25,7 +27,7 @@ public class QuietHours extends Activity {
 	}
 	public void openSettings(View view){
 		// Display the fragment as the main content.
-		FragmentTransaction transaction = getFragmentManager().beginTransaction().replace(R.id.intro, new SettingsFragment());
+		FragmentTransaction transaction = getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment());
 		transaction.addToBackStack(null);
 		transaction.commit();
 	}
