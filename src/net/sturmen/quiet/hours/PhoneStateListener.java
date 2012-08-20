@@ -29,6 +29,7 @@ import android.provider.CalendarContract;
 import android.telephony.TelephonyManager;
 import android.text.format.Time;
 import android.util.Log;
+import android.widget.Toast;
 
 public class PhoneStateListener extends BroadcastReceiver{ 
 	//initialize projection; required for content querying
@@ -47,11 +48,14 @@ public class PhoneStateListener extends BroadcastReceiver{
 	//globally define the debug tag
 	private static final String tag = "QUIETHOURS";
 	private static int original = 0;
+	private static boolean toastEnabled;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		if (prefs.getBoolean("pref_key_enabled", false)) {
+		toastEnabled = prefs.getBoolean("pref_key_toast", true);
+		Log.d(tag, "Toasts are " + toastEnabled);
+		if (prefs.getBoolean("pref_key_enabled", true)) {
 			//initialize the audio manager
 			AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 			//gather up the intent's extras into a bundle
@@ -104,27 +108,35 @@ public class PhoneStateListener extends BroadcastReceiver{
 			Log.d(tag, "No events. Putting on back.");
 		} else {
 			//evaluate the first one
-			evaluate(ringer, mCursor);
+			evaluate(context, ringer, mCursor);
 			//evaluate the rest of them
 			while(mCursor.moveToNext()){
-				evaluate(ringer, mCursor);
+				evaluate(context, ringer, mCursor);
 			}
 		}
 		mCursor.close();
 	}
-	public void evaluate(AudioManager ringer, Cursor cursor){
+	public void evaluate(Context context, AudioManager ringer, Cursor cursor){
+		//store the event's title as a variable for easy access later
+		String title = cursor.getString(cursor.getColumnIndex("TITLE"));
 		//check the description and title for the silent keyphrase
 		if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(silent) || cursor.getString(cursor.getColumnIndex("TITLE")).contains(silent))
 		{
 			//if it's there, change to silent
 			ringer.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to silent! (" + ringer.getRingerMode() + ")");
+			Log.d(tag, "Current event: " + title + ". Set to silent! (" + ringer.getRingerMode() + ")");
+			//send notification to user
+			if (toastEnabled) Toast.makeText(context, "Current event: " + title + "\nSet to silent.", Toast.LENGTH_SHORT).show();
 		}
 		//check the description and title for the vibrate keyphrase
 		else if (cursor.getString(cursor.getColumnIndex("DESCRIPTION")).contains(vibrate) || cursor.getString(cursor.getColumnIndex("TITLE")).contains(vibrate)) {
 			//same, but do not override silent with vibrate!
-			if (ringer.getRingerMode() != AudioManager.RINGER_MODE_SILENT) ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-			Log.d(tag, "Current event: " + cursor.getString(cursor.getColumnIndex("TITLE")) + ". Set to vibrate!(" + ringer.getRingerMode() + ")");
+			if (ringer.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
+				ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+				Log.d(tag, "Current event: " + title + ". Set to vibrate!(" + ringer.getRingerMode() + ")");
+				//send notification to user
+				if (toastEnabled) Toast.makeText(context, "Current event: " + title + "\nSet to vibrate.", Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 
