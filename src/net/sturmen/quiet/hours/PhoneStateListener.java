@@ -53,34 +53,35 @@ public class PhoneStateListener extends BroadcastReceiver{
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		toastEnabled = prefs.getBoolean("pref_key_toast", true);
-		Log.d(tag, "Toasts are " + toastEnabled);
 		if (prefs.getBoolean("pref_key_enabled", true)) {
+			toastEnabled = prefs.getBoolean("pref_key_toast", true);
+			Log.d(tag, "Toasts are " + toastEnabled);
 			//initialize the audio manager
 			AudioManager ringer = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-			//gather up the intent's extras into a bundle
-			Bundle extras = intent.getExtras();
-			//sanity check: if they exist...
-			if (extras != null) {
-				//get the state of the telephone
-				String state = extras.getString(TelephonyManager.EXTRA_STATE);
-				Log.d(tag, state);
-				//if the call is ending or otherwise returning to idle
-				if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-					//put the ringer back to what it was
-					if (original != 0) ringer.setRingerMode(original);
-					Log.d(tag, "Phone returned to " + original);
-					original = 0;
+			if (intent.getAction().equals("android.intent.action.PHONE_STATE"))
+			{
+				Log.d(tag, "Phone state changed.");
+				//gather up the intent's extras into a bundle
+				Bundle extras = intent.getExtras();
+				//sanity check: if they exist...
+				if (extras != null) {
+					//get the state of the telephone
+					String state = extras.getString(TelephonyManager.EXTRA_STATE);
+					Log.d(tag, state);
+					if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){ 
+						//store the previous phone state so we can return to it.
+						if (original == 0) original = ringer.getRingerMode();
+						Log.d(tag, "Original stored as " + state);
+						//and then this is where the magic happens...
+						getCurrent(context, ringer);
+					}
 				}
-				//otherwise it's idle -> ringing or ringing -> call
-				//so we must act
-				else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)){ 
-					//store the previous phone state so we can return to it.
-					original = ringer.getRingerMode();
-					Log.d(tag, "Original stored as " + state);
-					//and then this is where the magic happens...
-					getCurrent(context, ringer);
-				}
+			}
+			else if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED"))
+			{
+				Log.d(tag, "SMS received.");
+				if (original == 0) original = ringer.getRingerMode();
+				getCurrent(context, ringer);
 			}
 		}
 	}
@@ -136,6 +137,15 @@ public class PhoneStateListener extends BroadcastReceiver{
 				Log.d(tag, "Current event: " + title + ". Set to vibrate!(" + ringer.getRingerMode() + ")");
 				//send notification to user
 				if (toastEnabled) Toast.makeText(context, "Current event: " + title + "\nSet to vibrate.", Toast.LENGTH_SHORT).show();
+			}
+		}
+		else
+		{
+			if (original != 0) 
+			{
+				ringer.setRingerMode(original);
+				Log.d(tag, "Phone returned to " + original);
+				original = 0;
 			}
 		}
 	}
