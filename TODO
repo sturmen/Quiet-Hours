@@ -1,10 +1,4 @@
-TODO before 1.0 public release
--Fix any and all bugs
---Must debug Motorola Droid Bionic running prerelease software
-
 TODO post-release
--SMS support
--Notification of any sort support
 -In-app purchase to remove ads
 -Ongoing Notification
 --Checkbox in preferences
