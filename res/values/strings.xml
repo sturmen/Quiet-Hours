@@ -6,7 +6,7 @@
     <string name="hello">Hello</string>
     <string name="intro">Welcome to Quiet Hours! You will only see this screen once. The background service has been started.</string>
     <string name="howto">How To Use</string>
-    <string name="explanation">Simply add &quot;_silent&quot; or &quot;_vibrate&quot; anywhere in the description field of a calendar event (one that is synced to your phone, of course!) and all phone calls will be either silent or vibrating for the duration of the calendar event.</string>
+    <string name="explanation">Simply add &quot;_silent&quot; or &quot;_vibrate&quot; inside the Description field of a calendar event, and all phone calls and text messages will be silenced accordingly for the duration of the calendar event.</string>
     <string name="thanks">Thanks</string>
     <string name="contact">Please contact me if you have feedback: sturmen@outlook.com</string>
     <string name="opensource">Open Source</string>
