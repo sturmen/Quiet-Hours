@@ -39,7 +39,8 @@ public class PhoneStateListener extends BroadcastReceiver{
 		CalendarContract.Events.TITLE,
 		CalendarContract.Events.DESCRIPTION,
 		CalendarContract.Events.DTSTART,
-		CalendarContract.Events.DTEND
+		CalendarContract.Events.DTEND,
+		CalendarContract.Events.AVAILABILITY,
 	};
 	//define the vibrate keyphrase as a CharSequence
 	private CharSequence vibrate = "_vibrate".subSequence(0,7);
@@ -138,6 +139,10 @@ public class PhoneStateListener extends BroadcastReceiver{
 				//send notification to user
 				if (toastEnabled) Toast.makeText(context, "Current event: " + title + "\nSet to vibrate.", Toast.LENGTH_SHORT).show();
 			}
+		}
+		else if (cursor.getColumnIndex("AVAILIBILITY") == (CalendarContract.Events.AVAILABILITY_BUSY)) {
+			ringer.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+			if (toastEnabled) Toast.makeText(context, "Current event: " + title + "\nSet to vibrate.", Toast.LENGTH_SHORT).show();
 		}
 		else
 		{
